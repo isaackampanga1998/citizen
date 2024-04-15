@@ -6,12 +6,16 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
+
+import com.google.android.material.tabs.TabLayout;
+
 
 /**
  * A simple {@link Fragment} subclass.
@@ -66,60 +70,80 @@ public class List extends Fragment {
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_list, container, false);
 
+        ImageButton boutonImage = rootView.findViewById(R.id.addBtnImg);
 
+        // Ajoutez un écouteur d'événements pour détecter le clic sur le bouton
+        boutonImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Le code à exécuter lorsque le bouton est cliqué
+                // Par exemple, afficher un message Toast
+                replaceFragment(new RepportFragment());
+
+            }
+        });
 
 
         // Répéter le contenu de ScrollView pour TabLayout "publics" 5 fois
         LinearLayout listeContentLayout = rootView.findViewById(R.id.liste_content);
-        for (int i = 0; i < 5; i++) {
-            View view = inflater.inflate(R.layout.info_content, listeContentLayout, false);
-            listeContentLayout.addView(view);
-        }
-
-        // Répéter le contenu de ScrollView pour TabLayout "bris" 3 fois
-        for (int i = 0; i < 3; i++) {
-            View view = inflater.inflate(R.layout.info_content, listeContentLayout, false);
-            listeContentLayout.addView(view);
-        }
 
 
-        // Récupérer la vue racine du fragment
-        View fragmentView = getView();
-        if (fragmentView != null) {
-            // Récupérer la référence du bouton "Add"
 
-            LinearLayout linearLayout = fragmentView.findViewById(R.id.linearLayout2);
-            Button addButton = linearLayout.findViewById(R.id.addButton);
-            // Ajouter un écouteur de clic au bouton "Add"
-            addButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    // Créer une nouvelle instance du fragment RepportFragment
-                    RepportFragment repportFragment = new RepportFragment();
 
-                    // Obtenir le FragmentManager parent
-                    FragmentManager fragmentManager = getParentFragmentManager();
+        TabLayout tabLayout = rootView.findViewById(R.id.tabLayout);
+        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                // Vérifier l'onglet sélectionné et afficher un message correspondant
+                if (tab.getText().equals("Mes Bris")) {
+                    listeContentLayout.removeAllViews();
 
-                    // Commencer une nouvelle transaction
-                    FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                    // Répéter le contenu de ScrollView pour TabLayout "bris" 3 fois
+                    for (int i = 0; i < 1; i++) {
+                        View view = inflater.inflate(R.layout.info_content, listeContentLayout, false);
+                        listeContentLayout.addView(view);
+                    }
 
-                    // Remplacer le fragment actuel par RepportFragment
-                    fragmentTransaction.replace(R.id.container, repportFragment);
+                } else if (tab.getText().equals("Publics")) {
+                    listeContentLayout.removeAllViews();
 
-                    // Ajouter la transaction à la pile de retour
-                    fragmentTransaction.addToBackStack(null);
-
-                    // Valider la transaction
-                    fragmentTransaction.commit();
+                    for (int i = 0; i < 3; i++) {
+                        View view = inflater.inflate(R.layout.info_content, listeContentLayout, false);
+                        listeContentLayout.addView(view);
+                    }
                 }
-            });
-        }
+            }
 
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
+                // Ne rien faire lorsque l'onglet est désélectionné
+            }
 
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+                // Ne rien faire lorsque l'onglet est à nouveau sélectionné
+            }
+        });
 
         return rootView;
     }
 
     // Méthode pour remplacer le fragment actuel par un autre fragment
+    private void replaceFragment(Fragment newFragment) {
+        // Obtenir le FragmentManager parent
+        FragmentManager fragmentManager = getParentFragmentManager();
+
+        // Commencer une nouvelle transaction
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+
+        // Remplacer le fragment actuel par le nouveau fragment
+        fragmentTransaction.replace(R.id.container, newFragment);
+
+        // Ajouter la transaction à la pile de retour
+        fragmentTransaction.addToBackStack(null);
+
+        // Valider la transaction
+        fragmentTransaction.commit();
+    }
 
 }
