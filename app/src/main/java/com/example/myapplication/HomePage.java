@@ -48,9 +48,6 @@ public class HomePage extends AppCompatActivity {
                 // Actions à effectuer lorsque l'élément Notifications est sélectionné
                 replaceFragment(new Profile(this.user) );
                 return true;
-            }else if (item.getItemId() == R.id.add){
-                replaceFragment(new RepportFragment());
-                return true;
             }
 
             return false;
