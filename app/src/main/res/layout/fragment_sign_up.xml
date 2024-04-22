@@ -7,11 +7,6 @@
     android:id="@+id/main"
     tools:context=".MainActivity">
 
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:alpha="0.7"/>
-
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/tab_layout"
         android:layout_width="wrap_content"
@@ -73,7 +68,9 @@
                 android:id="@+id/editAgentNumber"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/agent_number" />
+                android:hint="@string/agent_number"
+                android:inputType="phone"
+                />
             <EditText
                 android:id="@+id/editTextNom"
                 android:layout_width="match_parent"
@@ -136,6 +133,11 @@
                 android:backgroundTint="@color/teal_500"
                 android:text="@string/sign_up"
                 app:cornerRadius="32dp"/>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:alpha="0.7" />
 
         </LinearLayout>
 

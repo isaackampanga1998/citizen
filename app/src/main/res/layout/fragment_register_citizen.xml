@@ -105,22 +105,16 @@
 
             <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <CheckBox
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/remember_me"
-                    android:layout_centerVertical="true"
-                    android:alpha="0.7"/>
-
+                android:layout_height="35dp">
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/forgot_password"
                     android:layout_alignParentEnd="true"
                     android:layout_centerVertical="true"
-                    android:id="@+id/forgot_password"/>
+                    android:id="@+id/forgot_password"
+                    android:textColor="@color/purple_500"
+                />
 
             </RelativeLayout>
             <View
@@ -135,7 +129,7 @@
                 android:text="@string/login_button"
                 app:cornerRadius="32dp"/>
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/sign_in_button"
+                android:id="@+id/register_sign_up_button"
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
                 android:backgroundTint="@color/purple_500"
