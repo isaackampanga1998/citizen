@@ -4,47 +4,40 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/bg"
     android:id="@+id/main"
     tools:context=".MainActivity">
 
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@color/teal_700"
-        android:alpha="0.7"/>
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/tab_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="16dp"
+        app:tabIndicatorColor="@color/teal_700"
+        app:tabSelectedTextColor="@color/teal_700"
+        app:tabTextColor="@color/teal_700"
+        app:tabTextAppearance="@style/TabLayoutTextAppearance">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:gravity="center"
-        android:layout_above="@id/card_view"
-        android:padding="20dp">
-
-        <ImageView
+        <com.google.android.material.tabs.TabItem
+            android:id="@+id/tab_layout_citoyent"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/baseline_account_circle_24"/>
+            android:text="Citoyent" />
 
-        <TextView
+        <com.google.android.material.tabs.TabItem
+            android:id="@+id/tab_layout_agent"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/sign_up"
-            android:textStyle="bold"
-            android:fontFamily="sans-serif-medium"
-            android:textSize="32sp"
-            android:textColor="@color/white"/>
+            android:text="Agent" />
 
-
-    </LinearLayout>
+    </com.google.android.material.tabs.TabLayout>
 
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
+        android:layout_centerInParent="true"
         app:cardCornerRadius="28dp"
-        android:layout_marginBottom="-20dp"
+        android:layout_marginHorizontal="32dp"
         android:id="@+id/card_view"
         >
 
@@ -52,7 +45,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="88dp">
+            android:paddingVertical="48dp"
+            android:paddingHorizontal="32dp">
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -68,55 +62,68 @@
                 android:alpha="0.7"/>
 
             <View
-                android:layout_width="wrap_content"
-                android:layout_height="30dp"/>
+                android:layout_width="match_parent"
+                android:layout_height="25dp"/>
+            <EditText
+                android:id="@+id/editAgentNumber"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/agent_number"
+                android:inputType="phone"
+                />
             <EditText
                 android:id="@+id/editTextNom"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Nom" />
+                android:hint="@string/name" />
 
             <EditText
                 android:id="@+id/editTextPrenom"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Prénom" />
+                android:hint="@string/first_name" />
 
             <EditText
                 android:id="@+id/editTextAdresse"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Adresse" />
+                android:hint="@string/adress" />
+            <EditText
+                android:id="@+id/editTextCity"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/city" />
 
             <EditText
                 android:id="@+id/editTextCourriel"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Courriel"
+                android:hint="@string/email_address"
                 android:inputType="textEmailAddress" />
 
             <EditText
-                android:id="@+id/editTextTelephone"
+                android:id="@+id/editTextPhoneNumber"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Numéro de téléphone"
+                android:hint="@string/phone_number"
                 android:inputType="phone" />
 
             <EditText
                 android:id="@+id/editTextMotDePasse"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Mot de passe"
+                android:hint="@string/password"
                 android:inputType="textPassword" />
 
             <EditText
                 android:id="@+id/editTextConfirmationMotDePasse"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Confirmation du mot de passe"
+                android:hint="@string/password_confirmation"
                 android:inputType="textPassword" />
+
             <View
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="30dp"/>
 
             <com.google.android.material.button.MaterialButton
@@ -127,23 +134,13 @@
                 android:text="@string/sign_up"
                 app:cornerRadius="32dp"/>
 
-
-            <LinearLayout
+            <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center">
-
-
-
-
-            </LinearLayout>
-
+                android:layout_height="match_parent"
+                android:alpha="0.7" />
 
         </LinearLayout>
 
-
     </androidx.cardview.widget.CardView>
-
 
 </RelativeLayout>

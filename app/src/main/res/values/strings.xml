@@ -1,4 +1,8 @@
 <resources>
+    <!-- App Name -->
+    <string name="app_name">Citizen</string>
+
+    <!-- Login Screen -->
     <string name="welcome_message">Bienvenue</string>
     <string name="login_info">Veuillez vous connecter avec vos informations</string>
     <string name="email_address">Adresse e-mail</string>
@@ -7,19 +11,30 @@
     <string name="forgot_password">J\'ai oublié mon mot de passe</string>
     <string name="login_button">Connexion</string>
     <string name="or_login_with">Ou connectez-vous avec</string>
-    <string name="app_name">Citizen</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <!-- Sign Up Screen -->
     <string name="sign_up">Enregistrer</string>
     <string name="signUp_info">Veillez saisir les information pour creer un compte</string>
+    <string name="name">Nom</string>
+    <string name="first_name">Prénom</string>
+    <string name="city">Ville</string>
+    <string name="adress">Adresse</string>
+    <string name="phone_number">Numéro de téléphone</string>
+    <string name="password_confirmation">Confirmation du mot de passe</string>
+    <string name="agent_number">Numero d\'agent</string>
+
+    <!-- Forgot Password Screen -->
     <string name="forget_password">Mot de passe oublié</string>
     <string name="forget_password_info">Veuillez saisir votre adresse e-mail pour réinitialiser votre mot de passe.</string>
-    <!-- Strings used for fragments for navigation -->
+
+    <!-- Navigation Strings -->
     <string name="first_fragment_label">First Fragment</string>
     <string name="second_fragment_label">Second Fragment</string>
     <string name="next">Next</string>
     <string name="previous">Previous</string>
 
+    <!-- Placeholder Text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="lorem_ipsum">
         Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam in scelerisque sem. Mauris
         volutpat, dolor id interdum ullamcorper, risus dolor egestas lectus, sit amet mattis purus
