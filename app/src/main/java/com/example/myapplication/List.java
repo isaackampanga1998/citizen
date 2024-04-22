@@ -23,7 +23,7 @@ public class List extends Fragment {
     private static final String ARG_PARAM2 = "param2";
     private String mParam1;
     private String mParam2;
-    private int role = 1;
+    private int role = 2;
 
     public List() {}
 
@@ -78,6 +78,20 @@ public class List extends Fragment {
             tabLayout.removeTabAt(0);
             TabLayout.Tab newTab = tabLayout.newTab().setText("La liste de bris");
             tabLayout.addTab(newTab);
+            listeContentLayout.removeAllViews();
+            for (int i = 0; i < 4; i++) {
+                View view = inflater.inflate(R.layout.info_content, listeContentLayout, false);
+                listeContentLayout.addView(view);
+                ImageView img = view.findViewById(R.id.image_main);
+
+                img.setOnClickListener(new View.OnClickListener(){
+                    public void onClick(View v) {
+                        Toast.makeText(getContext(), "Vous avez cliqué ", Toast.LENGTH_SHORT).show();
+                        replaceFragment(new BrisInfo());
+                    }
+                });
+            }
+
         }
         return rootView;
     }
