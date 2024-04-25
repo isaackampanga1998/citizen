@@ -31,4 +31,6 @@ public interface ApiService {
 
     @PUT("bris/{brisID}")
     Call<ResponseBody> updateBris(@Path("brisID") String brisID, @Body RequestBody body);
+    @PUT("user/forgotpassword")
+    Call<ResponseBody> forgotPassword(@Body RequestBody body);
 }
