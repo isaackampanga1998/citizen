@@ -5,7 +5,8 @@ import com.google.gson.annotations.SerializedName;
 public class Bris {
     @SerializedName("_id")
     private String id;
-
+    @SerializedName("username")
+    private String username;
     @SerializedName("nameBris")
     private String nomBris;
 
@@ -38,6 +39,9 @@ public class Bris {
         return id;
     }
 
+    public String getUsername(){
+        return this.username;
+    }
     public String getNomBris() {
         return nomBris;
     }
@@ -60,5 +64,13 @@ public class Bris {
 
     public String getDate() {
         return date;
+    }
+
+    public void setImage(String url){
+        this.image = url;
+    }
+
+    public void setDate (String date){
+        this.date = date;
     }
 }

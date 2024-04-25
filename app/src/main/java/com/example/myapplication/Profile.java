@@ -26,7 +26,7 @@ public class Profile extends Fragment {
 
         View view = inflater.inflate(R.layout.fragment_profile, container, false);
         TextView textViewNom = view.findViewById(R.id.textViewNom);
-        textViewNom.setText(this.user.getLastName());
+        textViewNom.setText(this.user.getLastName() + " " + this.user.getRole());
 
         TextView textViewPrenom = view.findViewById(R.id.textViewPrenom);
         textViewPrenom.setText(this.user.getFirstName());

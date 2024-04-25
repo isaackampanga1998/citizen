@@ -69,14 +69,14 @@
                         android:text="Nom: John"
                         android:textColor="#000000"
                         android:textStyle="bold" />
-
+<!--
                     <TextView
                         android:id="@+id/user_firstname"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Prénom: Doe"
                         android:textColor="#000000"
-                        android:textStyle="bold" />
+                        android:textStyle="bold" /> -->
 
                     <TextView
                         android:id="@+id/user_id"
@@ -143,10 +143,10 @@
                         android:layout_height="wrap_content" />
 
                     <Button
-                        android:id="@+id/bris_cancel_button"
+                        android:id="@+id/bris_delete_button"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Annuler" />
+                        android:text="Supprimer" />
 
                     <Button
                         android:id="@+id/bris_submit_button"

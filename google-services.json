@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "586376750284",
+    "project_id": "citizen-d0cef",
+    "storage_bucket": "citizen-d0cef.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:586376750284:android:90f2cb17781a0867754e69",
+        "android_client_info": {
+          "package_name": "com.school.citizen"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDjBvfctRLQq7iFjFmC3gOURF3jBf-LcHw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

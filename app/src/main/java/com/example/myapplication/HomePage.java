@@ -1,17 +1,13 @@
 package com.example.myapplication;
 
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.widget.Toast;
-import androidx.annotation.NonNull;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.example.myapplication.Model.User;
 import com.example.myapplication.databinding.ActivityHomePageBinding;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class HomePage extends AppCompatActivity {
 
@@ -23,7 +19,7 @@ public class HomePage extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         binding = ActivityHomePageBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-        replaceFragment(new List());
+
 
         // Récupérer les données de l'utilisateur de l'intent
         Bundle userData = getIntent().getExtras();
@@ -33,11 +29,13 @@ public class HomePage extends AppCompatActivity {
             this.user = User.parseFormatted(userDataString);
 
         }
+
+        replaceFragment(new ListBris(this.user));
         binding.bottomNavigationView.setOnNavigationItemSelectedListener(item -> {
 
 
             if (item.getItemId() == R.id.list) {
-                replaceFragment(new List());
+                replaceFragment(new ListBris(this.user));
                 // Actions à effectuer lorsque l'élément Accueil est sélectionné
                 return true;
             } else if (item.getItemId() == R.id.location) {

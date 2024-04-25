@@ -193,6 +193,8 @@ public class RegisterCitizen extends Fragment {
                     // Handle the successful login
                     Bundle userData = new Bundle();
                     User user = new User(45, xxx.getNom(), xxx.getPrenom(), xxx.getAdresse(), xxx.getCourriel(), "1234567890", "password");
+                    user.setRole(xxx.getRolesId());
+                    user.setUid(xxx.getId());
                     userData.putString("user", String.valueOf(user.formatted()));
                     Intent intent = new Intent(getActivity(), HomePage.class);
                     intent.putExtras(userData);

@@ -7,6 +7,8 @@ import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
+import com.example.myapplication.Modelretrofit.UserDTO;
+
 @Entity(tableName = "users")
 public class User {
     @PrimaryKey(autoGenerate = true)
@@ -24,6 +26,10 @@ public class User {
     private String phone;
     @ColumnInfo(name = "password")
     private String password;
+
+    private int role;
+
+    private String uid;
 
     @Ignore
     private Bitmap profilePicture;
@@ -50,6 +56,8 @@ public class User {
         this.password = password;
         this.profilePicture = profilePicture;
     }
+
+
 
     public User() {
 
@@ -96,6 +104,11 @@ public class User {
         return password;
     }
 
+    public int getRole (){
+        return  this.role;
+    }
+
+    public String getUid() { return uid;}
     // Setters for other fields
 
     public void setId(int id) {
@@ -126,13 +139,17 @@ public class User {
         this.password = password;
     }
 
+    public void setRole (int role){
+        this.role = role;
+    }
+    public void setUid (String uid) { this.uid = uid;}
     public String formatted() {
-        return String.format("%d@/@%s@/@%s@/@%s@/@%s@/@%s@/@%s", id, firstName, lastName, address, email, phone, password);
+        return String.format("%d@/@%s@/@%s@/@%s@/@%s@/@%s@/@%s@/@%d@/@%s", id, firstName, lastName, address, email, phone, password, role, uid);
     }
 
     public static User parseFormatted(String formattedString) {
         String[] parts = formattedString.split("@/@");
-        if (parts.length != 7) {
+        if (parts.length != 9) {
             throw new IllegalArgumentException("Invalid formatted string");
         }
         int id = Integer.parseInt(parts[0]);
@@ -142,7 +159,10 @@ public class User {
         String email = parts[4];
         String phone = parts[5];
         String password = parts[6];
-        return new User(id, firstName, lastName, address, email, phone, password);
+        User user = new User(id, firstName, lastName, address, email, phone, password);
+        user.setRole(Integer.parseInt(parts[7]));
+        user.setUid(parts[8]);
+        return user;
     }
 
 }
