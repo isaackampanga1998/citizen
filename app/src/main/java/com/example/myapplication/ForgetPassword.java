@@ -13,6 +13,21 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
+
+import com.example.myapplication.Modelretrofit.ApiService;
+import com.example.myapplication.Modelretrofit.RetrofitClient;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+import java.io.IOException;
+
+import okhttp3.MediaType;
+import okhttp3.RequestBody;
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -41,13 +56,8 @@ public class ForgetPassword extends Fragment {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (areFieldsValid()){
-                // Remplacer le fragment actuel par un nouveau fragment
-                FragmentManager fragmentManager = getParentFragmentManager();
-                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-                fragmentTransaction.replace(R.id.container, new RegisterCitizen());
-                fragmentTransaction.addToBackStack(null);  // Ajouter la transaction à la pile de retour
-                fragmentTransaction.commit();}
+                forgotPassword();
+
             }
         });
 
@@ -80,5 +90,53 @@ public class ForgetPassword extends Fragment {
             hasError = false;
         }
         return hasError;
+    }
+    public void forgotPassword() {
+        if (areFieldsValid()) {
+            // Create the JSON object and RequestBody
+            JSONObject paramObject = new JSONObject();
+            try {
+                paramObject.put("courriel", email.getText().toString());
+                paramObject.put("telephone", phoneNumber.getText().toString());
+                paramObject.put("newPassword", password.getText().toString());
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            RequestBody body = RequestBody.create(MediaType.parse("application/json"), paramObject.toString());
+
+            // Create the API service
+            ApiService apiService = RetrofitClient.getClient("https://sturdy-thoracic-health.glitch.me/").create(ApiService.class);
+
+            // Make the PUT request
+            Call<ResponseBody> call = apiService.forgotPassword(body);
+            call.enqueue(new Callback<ResponseBody>() {
+                @Override
+                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                    if (response.isSuccessful()) {
+                        // Remplacer le fragment actuel par un nouveau fragment
+                        FragmentManager fragmentManager = getParentFragmentManager();
+                        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                        fragmentTransaction.replace(R.id.container, new RegisterCitizen());
+                        fragmentTransaction.addToBackStack(null);  // Ajouter la transaction à la pile de retour
+                        fragmentTransaction.commit();
+                        Toast.makeText(getContext(), "Réinitialisation du mot de passe réussie", Toast.LENGTH_SHORT).show();
+
+                    } else {
+                        String errorMessage = "Échec de la réinitialisation du mot de passe";
+                        try {
+                            errorMessage += ": " + response.errorBody().string();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                        Toast.makeText(getContext(), errorMessage, Toast.LENGTH_LONG).show();
+                    }
+                }
+                @Override
+                public void onFailure(Call<ResponseBody> call, Throwable t) {
+                    Toast.makeText(getContext(), "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
     }
 }

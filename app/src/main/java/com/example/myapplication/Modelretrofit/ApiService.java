@@ -8,6 +8,7 @@ import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
+import retrofit2.http.PUT;
 import retrofit2.http.Query;
 
 import java.util.List;
@@ -22,4 +23,6 @@ public interface ApiService {
     Call<List<Bris>> getUserBris(@Query("userID") String userID);
     @POST("new/user")
     Call<ResponseBody> registerUser(@Body RequestBody body);
+    @PUT("user/forgotpassword")
+    Call<ResponseBody> forgotPassword(@Body RequestBody body);
 }
