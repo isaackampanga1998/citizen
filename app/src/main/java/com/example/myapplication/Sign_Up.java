@@ -86,13 +86,13 @@ public class Sign_Up extends Fragment {
                     address.setVisibility(View.VISIBLE);
                     city.setVisibility(View.GONE);
                     agentNumber.setVisibility(View.GONE);
-                    userRole = 2;
+                    userRole = 1;
                 } else {
                     //Agent 1
                     address.setVisibility(View.GONE);
                     city.setVisibility(View.VISIBLE);
                     agentNumber.setVisibility(View.VISIBLE);
-                    userRole = 1;
+                    userRole = 2;
                 }
             }
 
@@ -122,7 +122,7 @@ public class Sign_Up extends Fragment {
         boolean hasError = true;
         // Validation des champs ic tient compte de ca  pour les verification
         // Vérifier si les champs sont vides
-        if (userRole == 1) {
+        if (userRole == 2) {
             String agentNumberText = agentNumber.getText().toString().trim();
             if (agentNumberText.isEmpty()) {
                 agentNumber.setError("Le numero d'agent est requis");
@@ -205,7 +205,7 @@ public class Sign_Up extends Fragment {
         // Create the JSON object
         String addressDTO = "";
         int numeroAgent = 0;
-        if(userRole == 1){
+        if(userRole == 2){
             addressDTO = city.getText().toString();
             numeroAgent= parseInt(agentNumber.getText().toString());
         }else {

@@ -71,7 +71,7 @@ public class ListBris extends Fragment {
         boutonImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                replaceFragment(new RepportFragment());
+                replaceFragment(new RepportFragment(user));
             }
         });
 
