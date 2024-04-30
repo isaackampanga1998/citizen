@@ -2,6 +2,9 @@ package com.example.myapplication;
 
 import static android.content.Intent.getIntent;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -12,6 +15,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.example.myapplication.Model.User;
+import com.example.myapplication.databinding.FragmentProfileBinding;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -20,34 +24,49 @@ import com.example.myapplication.Model.User;
  */
 public class Profile extends Fragment {
     private User user;
+    private FragmentProfileBinding binding;
+
+    public Profile(User user) {
+        this.user = user;
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        View view = inflater.inflate(R.layout.fragment_profile, container, false);
-        TextView textViewNom = view.findViewById(R.id.textViewNom);
-        textViewNom.setText(this.user.getLastName() + " " + this.user.getRole());
+        binding = FragmentProfileBinding.inflate(inflater, container, false);
 
-        TextView textViewPrenom = view.findViewById(R.id.textViewPrenom);
-        textViewPrenom.setText(this.user.getFirstName());
+        binding.textViewNom.setText(this.user.getLastName() + " " + this.user.getRole());
+        binding.textViewPrenom.setText(this.user.getFirstName());
+        binding.textViewEmail.setText(this.user.getEmail());
+        binding.textViewAdresse.setText(this.user.getAddress());
 
-        TextView textViewEmail = view.findViewById(R.id.textViewEmail);
-        textViewEmail.setText(this.user.getEmail());
+        binding.deconnexion.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new AlertDialog.Builder(getContext())
+                        .setTitle("Confirmation")
+                        .setMessage("Êtes-vous sûr de vouloir vous déconnecter ?")
+                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                // L'utilisateur a confirmé, lancez l'activité RegisterCitizen
+                                Intent intent = new Intent(getActivity(), RegisterCitizen.class);
+                                startActivity(intent);
+                                getActivity().finish(); // Fermez l'activité actuelle
+                            }
+                        })
+                        .setNegativeButton(android.R.string.no, null) // L'utilisateur a refusé, ne faites rien
+                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .show();
+            }
+        });
 
-        TextView textViewAddress = view.findViewById(R.id.textViewAdresse);
-        textViewAddress.setText(this.user.getAddress());
-
-
-        // Inflate the layout for this fragment
-        return view;
+        return binding.getRoot();
     }
 
-    public Profile(User user){
-        this.user = user;
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        binding = null;
     }
-
-
-
-
-
 }
