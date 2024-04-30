@@ -33,6 +33,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -122,6 +123,36 @@ public class ListBris extends Fragment {
         fragmentTransaction.replace(R.id.container, newFragment);
         fragmentTransaction.addToBackStack(null);
         fragmentTransaction.commit();
+    }
+
+
+    public void deleteBris(Bris bris) {
+        // Create the API service
+        ApiService apiService = RetrofitClient.getClient("https://sturdy-thoracic-health.glitch.me/").create(ApiService.class);
+
+        // Make the DELETE request to delete the bris
+        Call<ResponseBody> call = apiService.deleteBris(bris.getId());
+
+        call.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                if (response.isSuccessful()) {
+                    // Handle successful deletion
+                    Toast.makeText(getActivity(), "Bris deleted successfully", Toast.LENGTH_SHORT).show();
+                    replaceFragment(new ListBris(user));
+                    // Optionally, you may want to refresh the list of bris here
+                } else {
+                    // Handle unsuccessful deletion
+                    Toast.makeText(getActivity(), "Failed to delete bris", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                // Handle the error
+                Toast.makeText(getActivity(), "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 /*
     public  void setListeContentLayout(LinearLayout listeContentLayout, LayoutInflater inflater){
@@ -295,6 +326,7 @@ public class ListBris extends Fragment {
                                         public void onClick(DialogInterface dialog, int which) {
                                             Toast.makeText(getContext(), "Vous avez supprimé", Toast.LENGTH_SHORT).show();
                                             BrisListMySelf(listeContentLayout, inflater);
+                                            deleteBris(bris);
                                         }
                                     });
                                     builder.setNegativeButton("Annuler", new DialogInterface.OnClickListener() {

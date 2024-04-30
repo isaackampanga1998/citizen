@@ -18,6 +18,8 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.example.myapplication.Model.User;
 import com.example.myapplication.Modelretrofit.ApiService;
@@ -224,6 +226,7 @@ public class RepportFragment extends Fragment {
                 if (response.isSuccessful()) {
                     // Image uploaded successfully
                     Toast.makeText(requireContext(), "Image téléchargée avec succès", Toast.LENGTH_SHORT).show();
+                    replaceFragment(new ListBris(user));
                 } else {
                     // Handle error response
                     try {
@@ -244,6 +247,12 @@ public class RepportFragment extends Fragment {
             }
         });
     }
-
+    private void replaceFragment(Fragment newFragment) {
+        FragmentManager fragmentManager = getParentFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.replace(R.id.container, newFragment);
+        fragmentTransaction.addToBackStack(null);
+        fragmentTransaction.commit();
+    }
 
 }
