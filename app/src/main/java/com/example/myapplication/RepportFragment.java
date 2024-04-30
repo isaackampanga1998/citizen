@@ -1,7 +1,7 @@
 package com.example.myapplication;
 
-import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
@@ -18,14 +18,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
 
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.Volley;
 import com.example.myapplication.Model.User;
 import com.example.myapplication.Modelretrofit.ApiService;
 import com.example.myapplication.Modelretrofit.RetrofitClient;
@@ -34,7 +27,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -45,6 +37,7 @@ import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
+import retrofit2.Response;
 
 public class RepportFragment extends Fragment {
 
@@ -168,9 +161,19 @@ public class RepportFragment extends Fragment {
                     imageView.setImageBitmap((android.graphics.Bitmap) extras.get("data"));
                 }
             } else if (requestCode == REQUEST_IMAGE_SELECTION && data != null) {
-                // Récupérer le chemin de l'image sélectionnée
+                // Récupérer le chemin de l'image sélectionnée à partir de l'URI
                 android.net.Uri selectedImageUri = data.getData();
-                imagePath = selectedImageUri.toString();
+                String[] filePathColumn = { MediaStore.Images.Media.DATA };
+                Cursor cursor = getActivity().getContentResolver().query(selectedImageUri, filePathColumn, null, null, null);
+                if (cursor != null) {
+                    cursor.moveToFirst();
+                    int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+                    imagePath = cursor.getString(columnIndex);
+                    cursor.close();
+                    Log.d("Image Path", "Image Path: " + imagePath);
+                } else {
+                    Log.e("Error", "Cursor is null");
+                }
                 imageView.setImageURI(selectedImageUri);
             }
         }
@@ -181,110 +184,66 @@ public class RepportFragment extends Fragment {
         JSONObject reportData = new JSONObject();
         try {
             // Ajouter les données pertinentes à l'objet JSON
-            reportData.put("nomBris", ((EditText) getView().findViewById(R.id.nomRepport)).getText().toString());
-            reportData.put("adresse", ((EditText) getView().findViewById(R.id.Adresse)).getText().toString());
+            reportData.put("nameBris", ((EditText) getView().findViewById(R.id.nomRepport)).getText().toString());
+            reportData.put("address", ((EditText) getView().findViewById(R.id.AdresseBris)).getText().toString());
             reportData.put("state", selectSpinner.getSelectedItem().toString());
             reportData.put("username", user.getFirstName() + " " + user.getLastName().toUpperCase().charAt(0));
             reportData.put("userID", user.getUid());
             // Ajouter le chemin de l'image si elle a été sélectionnée
+            if (imagePath != null && !imagePath.isEmpty()) {
+                // Convertir le fichier en un objet RequestBody
+                File file = new File(imagePath);
+                RequestBody requestFile = RequestBody.create(MediaType.parse("image/*"), file);
+                MultipartBody.Part imagePart = MultipartBody.Part.createFormData("image", file.getName(), requestFile);
+                // Ajouter l'image à la requête
 
-                File imageFile = new File(imagePath);
-                RequestBody imageBody = RequestBody.create(MediaType.parse("image/*"), imageFile);
-                MultipartBody.Part imagePart = MultipartBody.Part.createFormData("image", imageFile.getName(), imageBody);
-
-
-
-
-
-            // Enregistrer l'objet JSON dans un fichier ou l'envoyer à l'API
-            // Pour enregistrer dans un fichier
-            //saveJSONToFile(reportData.toString());
-
-            // Pour envoyer à l'API, utilisez reportData.toString() pour obtenir la chaîne JSON
-            //sendFormDataToServer(reportData);
-
-            RequestBody body = RequestBody.create(MediaType.parse("application/json"), reportData.toString());
-
-            // Create the API service
-            ApiService apiService = RetrofitClient.getClient("https://sturdy-thoracic-health.glitch.me/").create(ApiService.class);
-
-
-            // Make the POST request
-            //Call<ResponseBody> call = apiService.registerBris(body);
-            Call<ResponseBody> call = apiService.registerBris(imagePart, RequestBody.create(MediaType.parse("application/json"), reportData.toString()));
-
-
-
-
-
-
-
-            call.enqueue(new Callback<ResponseBody>() {
-                @Override
-                public void onResponse(Call<ResponseBody> call, retrofit2.Response<ResponseBody> response) {
-                    if (response.isSuccessful()) {
-                        Toast.makeText(getContext(), "Inscription réussie ! Bienvenue " + user.formatted(), Toast.LENGTH_SHORT).show();
-                        replaceFragment(new ListBris(user));
-                    } else {
-                        String errorMessage = "Échec de l'inscription";
-                        try {
-                            errorMessage += ": " + response.errorBody().string();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                        Toast.makeText(getContext(), errorMessage, Toast.LENGTH_LONG).show();
-                        Log.e("Error", errorMessage);
-                    }
-                }
-
-                @Override
-                public void onFailure(Call<ResponseBody> call, Throwable t) {
-                    Toast.makeText(getContext(), "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
-                }
-            });
+                Log.e("chaine", reportData.toString());
+                uploadImage(reportData.toString(), imagePart);
+            } else {
+                // Gérer le cas où aucune image n'est sélectionnée
+                Toast.makeText(requireContext(), "Veuillez sélectionner une image", Toast.LENGTH_SHORT).show();
+            }
         } catch (JSONException e) {
             e.printStackTrace();
         }
     }
 
-    private void saveJSONToFile(String jsonString) {
-        // Logique pour enregistrer la chaîne JSON dans un fichier
-        try {
-            FileOutputStream fos = requireContext().openFileOutput("form_data.json", Context.MODE_PRIVATE);
-            fos.write(jsonString.getBytes());
-            fos.close();
-            Toast.makeText(requireContext(), "Form data saved successfully", Toast.LENGTH_SHORT).show();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-    private void sendFormDataToServer(JSONObject formData) {
-        // Créer une requête POST avec Volley
-        String url = "https://sturdy-thoracic-health.glitch.me/upload"; // Remplacez URL_DU_SERVEUR par l'URL de votre serveur
-        JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, url, formData,
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        // Gérer la réponse du serveur
-                        Toast.makeText(requireContext(), "Form data uploaded successfully", Toast.LENGTH_SHORT).show();
-                    }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        // Gérer les erreurs de la requête
-                        Toast.makeText(requireContext(), "Error uploading form data: " + error.getMessage(), Toast.LENGTH_SHORT).show();
-                    }
-                });
+    private void uploadImage(String data, MultipartBody.Part imagePart) {
+        // Créer une instance de l'API service
+        ApiService apiService = RetrofitClient.getClient("https://sturdy-thoracic-health.glitch.me/").create(ApiService.class);
+        //ApiService apiService = RetrofitClient.getClient("http:/127.0.0.1:4000/").create(ApiService.class);
 
-        // Ajouter la requête à la file d'attente Volley
-        Volley.newRequestQueue(requireContext()).add(request);
+        // Créer un objet RequestBody pour les autres données JSON
+        RequestBody dataRequestBody = RequestBody.create(MediaType.parse("multipart/form-data"), data);
+
+        // Appeler la méthode d'API pour télécharger l'image
+        Call<ResponseBody> call = apiService.registerBris(imagePart, dataRequestBody);
+        call.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                if (response.isSuccessful()) {
+                    // Image uploaded successfully
+                    Toast.makeText(requireContext(), "Image téléchargée avec succès", Toast.LENGTH_SHORT).show();
+                } else {
+                    // Handle error response
+                    try {
+                        String errorBody = response.errorBody().string();
+                        Toast.makeText(requireContext(), "Erreur: " + errorBody, Toast.LENGTH_SHORT).show();
+                        Log.e("UNE ERREUR", errorBody);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                // Handle network failure
+                Toast.makeText(requireContext(), "Échec de la connexion réseau: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                Log.e("ECHEC", t.getMessage());
+            }
+        });
     }
-    private void replaceFragment(Fragment newFragment) {
-        FragmentManager fragmentManager = getParentFragmentManager();
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.replace(R.id.container, newFragment);
-        fragmentTransaction.addToBackStack(null);
-        fragmentTransaction.commit();
-    }
+
+
 }

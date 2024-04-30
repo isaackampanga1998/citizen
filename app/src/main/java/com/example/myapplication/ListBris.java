@@ -3,6 +3,7 @@ package com.example.myapplication;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,7 +22,10 @@ import com.example.myapplication.Modelretrofit.ApiService;
 import com.example.myapplication.Modelretrofit.Bris;
 import com.example.myapplication.Modelretrofit.BrisManager;
 import com.example.myapplication.Modelretrofit.RetrofitClient;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.tabs.TabLayout;
+import com.google.firebase.messaging.FirebaseMessaging;
 import com.squareup.picasso.Picasso;
 
 import java.text.ParseException;
@@ -66,6 +70,9 @@ public class ListBris extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_list, container, false);
         brisManager = new BrisManager(getContext());
         brisManager.fetchBris();
+
+
+
 
         ImageButton boutonImage = rootView.findViewById(R.id.addBtnImg);
         boutonImage.setOnClickListener(new View.OnClickListener() {
