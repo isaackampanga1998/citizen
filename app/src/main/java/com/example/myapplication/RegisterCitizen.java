@@ -84,11 +84,11 @@ public class RegisterCitizen extends Fragment {
                 // new LoginAsyncTask().execute(email, password);
 
                 // Login avec Retrofit
-                // Login avec Retrofit
                 String email = binding.uEmail.getText().toString();
                 String password = binding.uPassword.getText().toString();
+                if(!areFieldsValid()){
                 viewModel.loginAutentificationWithRetrofit(email, password);
-               // loginAutentificationWithRetrofit();
+                }
             }
         });
 
