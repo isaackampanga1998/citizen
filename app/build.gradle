@@ -6,6 +6,9 @@ plugins {
 android {
     namespace 'com.example.myapplication'
     compileSdk 34
+    viewBinding {
+        enabled = true
+    }
 
     defaultConfig {
         applicationId "com.example.myapplication"
@@ -52,5 +55,7 @@ dependencies {
     implementation platform('com.google.firebase:firebase-bom:32.8.1')
     implementation 'com.google.firebase:firebase-analytics'
     implementation 'com.squareup.picasso:picasso:2.71828'
+    implementation 'androidx.lifecycle:lifecycle-viewmodel:2.3.1'
+
 
 }

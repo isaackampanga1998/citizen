@@ -3,11 +3,9 @@ package com.example.myapplication;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.telephony.PhoneNumberUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -16,13 +14,14 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.example.myapplication.Model.User;
 import com.example.myapplication.Modelretrofit.ApiService;
 import com.example.myapplication.Modelretrofit.RetrofitClient;
 import com.example.myapplication.Modelretrofit.UserDTO;
 import com.example.myapplication.Modelretrofit.UserManager;
-import com.google.gson.Gson;
+import com.example.myapplication.databinding.FragmentRegisterCitizenBinding;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -37,47 +36,33 @@ public class RegisterCitizen extends Fragment {
 
     // Declare TextViews as instance variables
     private TextView u_email;
+    FragmentRegisterCitizenBinding binding;
+    private RegisterCitizenViewModel viewModel;
     private TextView u_pass;
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_register_citizen, container, false);
+        // Utiliser le binding de l'interface utilisateur pour gonfler la mise en page
+         binding = FragmentRegisterCitizenBinding.inflate(inflater, container, false);
+        View view = binding.getRoot();
+
+
+        viewModel = new ViewModelProvider(this).get(RegisterCitizenViewModel.class);
+
+        viewModel.getUserLiveData().observe(getViewLifecycleOwner(), user -> {
+            if (user != null) {
+                // Handle the successful login
+                Bundle userData = new Bundle();
+                userData.putString("user", String.valueOf(user.formatted()));
+                Intent intent = new Intent(getActivity(), HomePage.class);
+                intent.putExtras(userData);
+                startActivity(intent);
+            } else {
+                // Handle the unsuccessful login
+                Toast.makeText(getActivity(), "Échec de la connexion", Toast.LENGTH_SHORT).show();
+            }
+        });
 
         // Récupérer une référence au bouton
-        Button button_refactor = view.findViewById(R.id.register_sign_up_button);
-        Button button_connexion = view.findViewById(R.id.connexion_button);
-        TextView textViewForgetenPassWord = view.findViewById(R.id.forgot_password);
-
-        u_email = view.findViewById(R.id.u_email);
-        u_pass = view.findViewById(R.id.u_password);
-
-        textViewForgetenPassWord.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Remplacer le fragment actuel par un nouveau fragment
-                FragmentManager fragmentManager = getParentFragmentManager();
-                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-                fragmentTransaction.replace(R.id.container, new ForgetPassword());
-                fragmentTransaction.addToBackStack(null);  // Ajouter la transaction à la pile de retour
-                fragmentTransaction.commit();
-            }
-        });
-
-        button_connexion.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                // Votre logique de connexion ici avec ROOM
-                //String email = u_email.getText().toString();
-                //String password = u_pass.getText().toString();
-              //  new LoginAsyncTask().execute(email, password);
-
-                //Login avec Retrofit
-                loginAutentificationWithRetrofit();
-            }
-        });
-
-        // Ajouter un écouteur de clic au bouton
-        button_refactor.setOnClickListener(new View.OnClickListener() {
+        binding.registerSignUpButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 // Remplacer le fragment actuel par un nouveau fragment
@@ -89,8 +74,40 @@ public class RegisterCitizen extends Fragment {
             }
         });
 
+        // Ajouter un écouteur de clic au bouton de connexion
+        binding.connexionButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Votre logique de connexion ici avec ROOM
+                // String email = binding.uEmail.getText().toString();
+                // String password = binding.uPassword.getText().toString();
+                // new LoginAsyncTask().execute(email, password);
+
+                // Login avec Retrofit
+                // Login avec Retrofit
+                String email = binding.uEmail.getText().toString();
+                String password = binding.uPassword.getText().toString();
+                viewModel.loginAutentificationWithRetrofit(email, password);
+               // loginAutentificationWithRetrofit();
+            }
+        });
+
+        // Ajouter un écouteur de clic pour le lien de mot de passe oublié
+        binding.forgotPassword.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Remplacer le fragment actuel par un nouveau fragment
+                FragmentManager fragmentManager = getParentFragmentManager();
+                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                fragmentTransaction.replace(R.id.container, new ForgetPassword());
+                fragmentTransaction.addToBackStack(null);  // Ajouter la transaction à la pile de retour
+                fragmentTransaction.commit();
+            }
+        });
+
         return view;
     }
+
 
     private class LoginAsyncTask extends AsyncTask<String, Void, User> {
 
@@ -150,14 +167,14 @@ public class RegisterCitizen extends Fragment {
         // Validation des champs ic tient compte de ca  pour les verification
         // Vérifier si les champs sont vides
 
-        String emailText = u_email.getText().toString().trim();
+        String emailText = binding.uEmail.getText().toString().trim();
         if (emailText.isEmpty()) {
-            u_email.setError("L'email est requis");
+            binding.uEmail.setError("L'email est requis");
             hasError = true;
         }
 
-        if (u_pass.getText().toString().trim().isEmpty()) {
-            u_pass.setError("Le mot de passe est requis");
+        if (binding.uPassword.getText().toString().trim().isEmpty()) {
+            binding.uPassword.setError("Le mot de passe est requis");
             hasError = true;
         }
 
@@ -172,8 +189,8 @@ public class RegisterCitizen extends Fragment {
         // Create the JSON object and RequestBody
         JSONObject paramObject = new JSONObject();
         try {
-            paramObject.put("courriel", u_email.getText().toString());
-            paramObject.put("password", u_pass.getText().toString());
+            paramObject.put("courriel", binding.uEmail.getText().toString());
+            paramObject.put("password", binding.uPassword.getText().toString());
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -189,12 +206,12 @@ public class RegisterCitizen extends Fragment {
             @Override
             public void onResponse(Call<UserDTO> call, Response<UserDTO> response) {
                 if (response.isSuccessful()) {
-                    UserDTO xxx = response.body();
+                    UserDTO userDTO = response.body();
                     // Handle the successful login
                     Bundle userData = new Bundle();
-                    User user = new User(45, xxx.getNom(), xxx.getPrenom(), xxx.getAdresse(), xxx.getCourriel(), "1234567890", "password");
-                    user.setRole(xxx.getRolesId());
-                    user.setUid(xxx.getId());
+                    User user = new User(45, userDTO.getNom(), userDTO.getPrenom(), userDTO.getAdresse(), userDTO.getCourriel(), "1234567890", "password");
+                    user.setRole(userDTO.getRolesId());
+                    user.setUid(userDTO.getId());
                     userData.putString("user", String.valueOf(user.formatted()));
                     Intent intent = new Intent(getActivity(), HomePage.class);
                     intent.putExtras(userData);
