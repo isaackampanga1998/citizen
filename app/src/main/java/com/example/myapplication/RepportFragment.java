@@ -4,11 +4,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.Toast;
@@ -16,19 +18,33 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
-import org.json.JSONArray;
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
+import com.example.myapplication.Model.User;
+import com.example.myapplication.Modelretrofit.ApiService;
+import com.example.myapplication.Modelretrofit.RetrofitClient;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
+import java.io.File;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Callback;
 
 public class RepportFragment extends Fragment {
 
@@ -45,8 +61,18 @@ public class RepportFragment extends Fragment {
     private Spinner selectSpinner;
     private Button takePhotoBtn, choosePhotoBtn, saveFormBtn;
 
+    // Variable pour stocker le chemin de l'image
+    private String imagePath;
+
+    private User user;
+
     public RepportFragment() {
         // Required empty public constructor
+    }
+
+    public RepportFragment(User user) {
+        // Required empty public constructor
+        this.user = user;
     }
 
     public static RepportFragment newInstance(String param1, String param2) {
@@ -87,8 +113,6 @@ public class RepportFragment extends Fragment {
         // Populating spinner with items
         List<String> spinnerItems = new ArrayList<>();
         spinnerItems.add("En analyse");
-        spinnerItems.add("En cours de traitement");
-        spinnerItems.add("Pas reaction");
         ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_item, spinnerItems);
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         selectSpinner.setAdapter(spinnerAdapter);
@@ -144,88 +168,123 @@ public class RepportFragment extends Fragment {
                     imageView.setImageBitmap((android.graphics.Bitmap) extras.get("data"));
                 }
             } else if (requestCode == REQUEST_IMAGE_SELECTION && data != null) {
-                imageView.setImageURI(data.getData());
+                // Récupérer le chemin de l'image sélectionnée
+                android.net.Uri selectedImageUri = data.getData();
+                imagePath = selectedImageUri.toString();
+                imageView.setImageURI(selectedImageUri);
             }
         }
     }
 
     private void saveForm() {
-        // Logic to save form data
         // Créer un objet JSON pour stocker les données
         JSONObject reportData = new JSONObject();
         try {
             // Ajouter les données pertinentes à l'objet JSON
-            reportData.put("selectedItem", selectSpinner.getSelectedItem().toString());
-            // Vous pouvez également ajouter d'autres données, telles que l'image sélectionnée
-            // par exemple, reportData.put("imagePath", imagePath);
+            reportData.put("nomBris", ((EditText) getView().findViewById(R.id.nomRepport)).getText().toString());
+            reportData.put("adresse", ((EditText) getView().findViewById(R.id.Adresse)).getText().toString());
+            reportData.put("state", selectSpinner.getSelectedItem().toString());
+            reportData.put("username", user.getFirstName() + " " + user.getLastName().toUpperCase().charAt(0));
+            reportData.put("userID", user.getUid());
+            // Ajouter le chemin de l'image si elle a été sélectionnée
 
-            // Convertir l'objet JSON en chaîne
-            String jsonString = reportData.toString();
+                File imageFile = new File(imagePath);
+                RequestBody imageBody = RequestBody.create(MediaType.parse("image/*"), imageFile);
+                MultipartBody.Part imagePart = MultipartBody.Part.createFormData("image", imageFile.getName(), imageBody);
 
-            // Écrire la chaîne JSON dans un fichier
-            writeJSONToFile(jsonString);
+
+
+
+
+            // Enregistrer l'objet JSON dans un fichier ou l'envoyer à l'API
+            // Pour enregistrer dans un fichier
+            //saveJSONToFile(reportData.toString());
+
+            // Pour envoyer à l'API, utilisez reportData.toString() pour obtenir la chaîne JSON
+            //sendFormDataToServer(reportData);
+
+            RequestBody body = RequestBody.create(MediaType.parse("application/json"), reportData.toString());
+
+            // Create the API service
+            ApiService apiService = RetrofitClient.getClient("https://sturdy-thoracic-health.glitch.me/").create(ApiService.class);
+
+
+            // Make the POST request
+            //Call<ResponseBody> call = apiService.registerBris(body);
+            Call<ResponseBody> call = apiService.registerBris(imagePart, RequestBody.create(MediaType.parse("application/json"), reportData.toString()));
+
+
+
+
+
+
+
+            call.enqueue(new Callback<ResponseBody>() {
+                @Override
+                public void onResponse(Call<ResponseBody> call, retrofit2.Response<ResponseBody> response) {
+                    if (response.isSuccessful()) {
+                        Toast.makeText(getContext(), "Inscription réussie ! Bienvenue " + user.formatted(), Toast.LENGTH_SHORT).show();
+                        replaceFragment(new ListBris(user));
+                    } else {
+                        String errorMessage = "Échec de l'inscription";
+                        try {
+                            errorMessage += ": " + response.errorBody().string();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                        Toast.makeText(getContext(), errorMessage, Toast.LENGTH_LONG).show();
+                        Log.e("Error", errorMessage);
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<ResponseBody> call, Throwable t) {
+                    Toast.makeText(getContext(), "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
         } catch (JSONException e) {
             e.printStackTrace();
         }
     }
-    private void writeJSONToFile(String jsonString) {
+
+    private void saveJSONToFile(String jsonString) {
+        // Logique pour enregistrer la chaîne JSON dans un fichier
         try {
-            // Créer un objet JSON à partir de la chaîne JSON
-            JSONObject jsonObject = new JSONObject(jsonString);
-
-            // Lire le fichier JSON existant ou créer un nouveau tableau JSON
-            JSONArray jsonArray;
-            try {
-                jsonArray = new JSONArray(FileUtils.readFromFile(getContext(), "report.json"));
-            } catch (JSONException e) {
-                jsonArray = new JSONArray();
-            }
-
-            // Ajouter le nouvel objet JSON au tableau JSON
-            jsonArray.put(jsonObject);
-
-            // Écrire le tableau JSON dans le fichier
-            FileWriter file = new FileWriter(getContext().getFilesDir().getPath() + "/report.json");
-            file.write(jsonArray.toString());
-            file.flush();
-            file.close();
-
-            Toast.makeText(requireContext(), "Form saved", Toast.LENGTH_SHORT).show();
-        } catch (IOException | JSONException e) {
-            e.printStackTrace();
-        }
-    }
-}
-
-
-class FileUtils {
-
-    // Méthode pour écrire dans un fichier
-    public static void writeToFile(Context context, String filename, String data) {
-        try {
-            FileOutputStream fos = context.openFileOutput(filename, Context.MODE_PRIVATE);
-            fos.write(data.getBytes());
+            FileOutputStream fos = requireContext().openFileOutput("form_data.json", Context.MODE_PRIVATE);
+            fos.write(jsonString.getBytes());
             fos.close();
-        } catch (Exception e) {
+            Toast.makeText(requireContext(), "Form data saved successfully", Toast.LENGTH_SHORT).show();
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
+    private void sendFormDataToServer(JSONObject formData) {
+        // Créer une requête POST avec Volley
+        String url = "https://sturdy-thoracic-health.glitch.me/upload"; // Remplacez URL_DU_SERVEUR par l'URL de votre serveur
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, url, formData,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        // Gérer la réponse du serveur
+                        Toast.makeText(requireContext(), "Form data uploaded successfully", Toast.LENGTH_SHORT).show();
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        // Gérer les erreurs de la requête
+                        Toast.makeText(requireContext(), "Error uploading form data: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                });
 
-    // Méthode pour lire à partir d'un fichier
-    public static String readFromFile(Context context, String filename) {
-        StringBuilder stringBuilder = new StringBuilder();
-        try {
-            FileInputStream fis = context.openFileInput(filename);
-            InputStreamReader inputStreamReader = new InputStreamReader(fis);
-            BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-            String line;
-            while ((line = bufferedReader.readLine()) != null) {
-                stringBuilder.append(line).append("\n");
-            }
-            fis.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return stringBuilder.toString();
+        // Ajouter la requête à la file d'attente Volley
+        Volley.newRequestQueue(requireContext()).add(request);
+    }
+    private void replaceFragment(Fragment newFragment) {
+        FragmentManager fragmentManager = getParentFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.replace(R.id.container, newFragment);
+        fragmentTransaction.addToBackStack(null);
+        fragmentTransaction.commit();
     }
 }
